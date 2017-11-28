@@ -15,11 +15,14 @@ class SearchBar extends React.Component {
         this.isActive = this.isActive.bind(this)
         this.cursorDown = this.cursorDown.bind(this)
         this.cursorUp = this.cursorUp.bind(this)
-        this.selectItem = this.selectItem.bind(this)
+        this.displayResult = this.displayResult.bind(this)
     }
 
     handleChange(event) {
       this.setState({ searchTerm: event.target.value });
+      if (event.target.value.length === 0){
+        this.props.onResetResults()
+      }
     }
 
     handleKeyDown(event){
@@ -27,6 +30,8 @@ class SearchBar extends React.Component {
         switch (event.keyCode) {
           case 13:
             console.log("you pressed enter")
+            event.preventDefault()
+            this.displayResult()
             break;
           case 38:
             console.log("you pressed up")
@@ -68,12 +73,28 @@ class SearchBar extends React.Component {
     selectItem(item) {
       this.setState({
         searchTerm: item.author,
-        results: [],
         toggleDDL: false,
         iter: null
       })
-      console.log(this.state.results)
+      this.props.onPushResults([item])
+      console.log(item);
     }
+
+    displayResult(){
+			if (this.state.iter==null){
+        this.props.onPushResults(this.state.receivedBooks);
+			} else {
+				var item = this.state.receivedBooks[this.state.iter];
+        this.props.onPushResults([item])
+        this.setState({
+          searchTerm: item.author
+        })
+      }
+      this.setState({
+        toggleDDL: false,
+        iter: null
+      })
+		}
 
     render() {
 
@@ -85,13 +106,13 @@ class SearchBar extends React.Component {
                     onKeyDown={this.handleKeyDown} />
                 
                 <ul className="dropdown-menu" style={(this.state.toggleDDL) ? { display: 'block' } : { display: 'none' }}>
-                    {this.state.receivedBooks.map(function(item,index){
+                    {this.state.receivedBooks.map((item,index) =>
                       <li className={'dropdown-item '.concat((this.isActive(index)) ? 'active' : '')} 
                           key={item.id}
-                          onClick={this.selectItem(item)}>
+                          onClick={this.selectItem.bind(this,item)}>
                         <a>{item.name}</a>
                       </li>
-                    },this)}
+                    ,this)}
                 </ul>
                                     
             </div>

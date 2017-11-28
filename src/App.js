@@ -10,12 +10,19 @@ class App extends React.Component {
             results: [],
         };
         this.pushResults = this.pushResults.bind(this)
+        this.resetResults = this.resetResults.bind(this)
+    }
+
+    resetResults(){
+        this.setState({
+            results : []
+        });
     }
 
     pushResults(res){
         this.setState({
-          results : res
-        });
+            results : res.slice()
+        })
     }
 
     render() {
@@ -27,7 +34,9 @@ class App extends React.Component {
                     <h1 className="navbar-brand mb-0">{title}</h1>
                 </nav>
                 <div className="container my-5 px-0">
-                    <SearchBar onPushResults={this.pushResults} />
+                    <SearchBar 
+                        onPushResults={this.pushResults}
+                        onResetResults={this.resetResults} />
                     <Result results={this.state.results} />
                 </div>
             </div>

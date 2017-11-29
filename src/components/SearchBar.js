@@ -1,4 +1,5 @@
 import React from "react";
+import fetch from 'cross-fetch'
 import "./SearchBar.css";
 
 class SearchBar extends React.Component {
@@ -16,12 +17,15 @@ class SearchBar extends React.Component {
         this.cursorDown = this.cursorDown.bind(this)
         this.cursorUp = this.cursorUp.bind(this)
         this.displayResult = this.displayResult.bind(this)
+        this.receiveAutocomplete = this.receiveAutocomplete.bind(this)
     }
 
     handleChange(event) {
       this.setState({ searchTerm: event.target.value });
       if (event.target.value.length === 0){
         this.props.onResetResults()
+      } else {
+        this.receiveAutocomplete();
       }
     }
 
@@ -95,6 +99,15 @@ class SearchBar extends React.Component {
         iter: null
       })
 		}
+
+    receiveAutocomplete(){
+      fetch('http://localhost:1110/books?author='+this.state.searchTerm)
+        .then(function(response) {
+            console.log(response.error)
+            return response.json()
+          })
+        .then(json => this.setState({receivedBooks:json}))
+    }
 
     render() {
 

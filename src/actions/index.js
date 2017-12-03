@@ -7,3 +7,7 @@ export function resetResults() {
 export function pushResults(results) {
     return { type: actType.PUSH_RESULTS, results }
 }
+
+export function toggleAutocomplete(arg) {
+    return { type: actType.TOGGLE_AUTOCOMPLETE, arg }
+}

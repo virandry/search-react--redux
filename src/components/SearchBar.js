@@ -1,13 +1,14 @@
 import React from "react";
 import fetch from 'cross-fetch';
 import {debounce} from 'throttle-debounce';
+import { connect } from 'react-redux';
+import * as action from "../actions"
 import "./SearchBar.css";
 
 class SearchBar extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-          toggleDDL: false,
           searchTerm: '',
           receivedBooks: [],
           iter: null,
@@ -34,10 +35,8 @@ class SearchBar extends React.Component {
       );
     }
 
-    toggleAutocomplete(arg=!this.state.toggleDDL){
-      this.setState({
-        toggleDDL: arg
-      })
+    toggleAutocomplete(arg){
+      this.props.toggleAutocomplete(arg)
     }
 
     handleKeyDown(event){
@@ -88,9 +87,9 @@ class SearchBar extends React.Component {
     selectItem(item) {
       this.setState({
         searchTerm: item.author,
-        toggleDDL: false,
         iter: null
       })
+      this.toggleAutocomplete(false)
       this.props.onPushResults([item])
       console.log(item);
     }
@@ -106,9 +105,9 @@ class SearchBar extends React.Component {
         })
       }
       this.setState({
-        toggleDDL: false,
         iter: null
       })
+      this.toggleAutocomplete(false)
 		}
 
     receiveAutocomplete(){
@@ -138,7 +137,7 @@ class SearchBar extends React.Component {
                     onChange={this.handleChange}
                     onKeyDown={this.handleKeyDown} />
                 
-                <ul className="dropdown-menu" style={(this.state.toggleDDL) ? { display: 'block' } : { display: 'none' }}>
+                <ul className="dropdown-menu" style={(this.props.toggleDDL) ? { display: 'block' } : { display: 'none' }}>
                     {this.state.receivedBooks.map((item,index) =>
                       <li className={'dropdown-item '.concat((this.isActive(index)) ? 'active' : '')} 
                           key={item.id}
@@ -152,4 +151,17 @@ class SearchBar extends React.Component {
         );
     }
 }
-export default SearchBar;
+
+const mapStateToProps = (state, ownProps) => {
+  return {
+    toggleDDL: state.searchBar.toggleDDL
+  }
+};
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    toggleAutocomplete: (arg) => dispatch(action.toggleAutocomplete(arg))
+  }
+};
+
+export default connect(mapStateToProps,mapDispatchToProps)(SearchBar);

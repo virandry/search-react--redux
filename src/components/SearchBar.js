@@ -1,5 +1,4 @@
 import React from "react";
-import fetch from 'cross-fetch';
 import {debounce} from 'throttle-debounce';
 import { connect } from 'react-redux';
 import * as action from "../actions"
@@ -10,7 +9,6 @@ class SearchBar extends React.Component {
         super(props);
         this.state = {
           searchTerm: '',
-          receivedBooks: [],
           iter: null,
         };
         this.handleChange = this.handleChange.bind(this)
@@ -67,10 +65,10 @@ class SearchBar extends React.Component {
     }
 
     cursorDown() {
-      console.log(this.state.iter < this.state.receivedBooks.length - 1);
+      console.log(this.state.iter < this.props.receivedBooks.length - 1);
       if (this.state.iter == null) {
         this.setState({iter: 0})
-      } else if (this.state.iter < this.state.receivedBooks.length - 1) {
+      } else if (this.state.iter < this.props.receivedBooks.length - 1) {
         this.setState(prevState => { return { iter : prevState.iter + 1 }; })
       }
       console.log(this.state.iter);
@@ -89,43 +87,26 @@ class SearchBar extends React.Component {
         searchTerm: item.author,
         iter: null
       })
-      this.toggleAutocomplete(false)
       this.props.onPushResults([item])
       console.log(item);
     }
 
     displayResult(){
 			if (this.state.iter==null){
-        this.props.onPushResults(this.state.receivedBooks);
+        this.props.onPushResults(this.props.receivedBooks);
 			} else {
-				var item = this.state.receivedBooks[this.state.iter];
+				var item = this.props.receivedBooks[this.state.iter];
         this.props.onPushResults([item])
         this.setState({
-          searchTerm: item.author
+          searchTerm: item.author,
+          iter: null
         })
       }
-      this.setState({
-        iter: null
-      })
       this.toggleAutocomplete(false)
 		}
 
     receiveAutocomplete(){
-      console.log("searching... " + this.state.searchTerm);
-      fetch('http://localhost:1110/books?author='+this.state.searchTerm)
-        .then(response => {
-            return response.json()
-          })
-        .then(json => {
-          console.log(typeof json.error==='undefined')
-          if (typeof json.error === 'undefined'){
-            this.toggleAutocomplete(true)
-            this.setState({receivedBooks:json})
-          } else {
-            this.toggleAutocomplete(false)
-            this.setState({receivedBooks:[]})
-          }
-        })
+      this.props.fetchAutocomplete(this.state.searchTerm)
     }
 
     render() {
@@ -138,7 +119,7 @@ class SearchBar extends React.Component {
                     onKeyDown={this.handleKeyDown} />
                 
                 <ul className="dropdown-menu" style={(this.props.toggleDDL) ? { display: 'block' } : { display: 'none' }}>
-                    {this.state.receivedBooks.map((item,index) =>
+                    {this.props.receivedBooks.map((item,index) =>
                       <li className={'dropdown-item '.concat((this.isActive(index)) ? 'active' : '')} 
                           key={item.id}
                           onClick={this.selectItem.bind(this,item)}>
@@ -154,13 +135,15 @@ class SearchBar extends React.Component {
 
 const mapStateToProps = (state, ownProps) => {
   return {
-    toggleDDL: state.searchBar.toggleDDL
+    toggleDDL: state.searchBar.toggleDDL,
+    receivedBooks: state.searchBar.receivedBooks
   }
 };
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    toggleAutocomplete: (arg) => dispatch(action.toggleAutocomplete(arg))
+    toggleAutocomplete: (arg) => dispatch(action.toggleAutocomplete(arg)),
+    fetchAutocomplete: (searchTerm) => dispatch(action.fetchAutocomplete(searchTerm))
   }
 };
 

@@ -1,4 +1,4 @@
-# Book Search - Front End (Reactjs)
+# Book Search - Front End (React + Redux)
 
 ## Build Setup
 

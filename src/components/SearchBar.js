@@ -113,7 +113,7 @@ class SearchBar extends React.Component {
 
     receiveAutocomplete(){
       console.log("searching... " + this.state.searchTerm);
-      fetch('http://localhost:1e110/books?author='+this.state.searchTerm)
+      fetch('http://localhost:1110/books?author='+this.state.searchTerm)
         .then(response => {
             return response.json()
           })

@@ -1,0 +1,2 @@
+export const RESET_RESULTS = 'RESET_RESULTS'
+export const PUSH_RESULTS = 'PUSH_RESULTS'

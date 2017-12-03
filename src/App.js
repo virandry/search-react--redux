@@ -1,28 +1,28 @@
 import React from "react";
 import SearchBar from "./components/SearchBar";
 import Result from "./components/Result";
+import { connect } from 'react-redux';
+import * as action from "./actions"
 
 class App extends React.Component {
-    constructor() {
-        super();
+    constructor(props) {
+        super(props);
         this.state = {
             title: "Mini Search Engine",
-            results: [],
         };
         this.pushResults = this.pushResults.bind(this)
         this.resetResults = this.resetResults.bind(this)
     }
 
     resetResults(){
-        this.setState({
-            results : []
-        });
+        this.props.resetResults()
     }
 
     pushResults(res){
-        this.setState({
-            results : res.slice()
-        })
+        // this.setState({
+        //     results : res.slice()
+        // })
+        this.props.pushResults(res)
     }
 
     render() {
@@ -37,11 +37,25 @@ class App extends React.Component {
                     <SearchBar 
                         onPushResults={this.pushResults}
                         onResetResults={this.resetResults} />
-                    <Result results={this.state.results} />
+                    <Result results={this.props.results} />
                 </div>
             </div>
         );
     }
 }
 
-export default App;
+
+const mapStateToProps = (state, ownProps) => {
+    return {
+        results: state.searchApp.results
+    }
+};
+
+const mapDispatchToProps = (dispatch) => {
+    return {
+        resetResults: () => dispatch(action.resetResults()),
+        pushResults: (results) => dispatch(action.pushResults(results))
+    }
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(App);

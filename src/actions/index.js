@@ -34,6 +34,5 @@ export const fetchAutocomplete = searchTerm => dispatch => {
                 dispatch(receiveAutocomplete([]))
             }
         })
-
 }
 
